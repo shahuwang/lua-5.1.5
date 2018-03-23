@@ -113,7 +113,9 @@ void luaF_close (lua_State *L, StkId level) {
 
 
 Proto *luaF_newproto (lua_State *L) {
+  //初始化内存
   Proto *f = luaM_new(L, Proto);
+  //先把f转换为lua的对象
   luaC_link(L, obj2gco(f), LUA_TPROTO);
   f->k = NULL;
   f->sizek = 0;

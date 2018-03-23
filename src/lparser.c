@@ -391,6 +391,7 @@ Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff, const char *name) {
   funcstate.f->is_vararg = VARARG_ISVARARG;  /* main func. is always vararg */
   luaX_next(&lexstate);  /* read first token */
   chunk(&lexstate);
+  //确保分析到了chunk的结尾
   check(&lexstate, TK_EOS);
   close_func(&lexstate);
   lua_assert(funcstate.prev == NULL);

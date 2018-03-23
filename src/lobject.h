@@ -227,15 +227,17 @@ typedef union Udata {
 
 /*
 ** Function Prototypes
+  函数原型结构
 */
 typedef struct Proto {
+  //宏定义来的，包含了几个字段，所有可回收的对象，都有这个
   CommonHeader;
   TValue *k;  /* constants used by the function */
   Instruction *code;
-  struct Proto **p;  /* functions defined inside the function */
+  struct Proto **p;  /* functions defined inside the function 函数内定义的函数 */
   int *lineinfo;  /* map from opcodes to source lines */
-  struct LocVar *locvars;  /* information about local variables */
-  TString **upvalues;  /* upvalue names */
+  struct LocVar *locvars;  /* information about local variables 函数内定义的local变量 */
+  TString **upvalues;  /* upvalue names 此函数内可使用的upvalue名称*/
   TString  *source;
   int sizeupvalues;
   int sizek;  /* size of `k' */
