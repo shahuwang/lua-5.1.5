@@ -351,11 +351,13 @@ static int pmain (lua_State *L) {
   if (s->status != 0) return 0;
   script = collectargs(argv, &has_i, &has_v, &has_e);
   if (script < 0) {  /* invalid args? */
+    //解析参数错误的时候，print出使用方法来
     print_usage();
     s->status = 1;
     return 0;
   }
   if (has_v) print_version();
+  //这里执行的是 -e 和 -l 参数，执行一行或者加载库
   s->status = runargs(L, argv, (script > 0) ? script : s->argc);
   if (s->status != 0) return 0;
   if (script)
@@ -373,7 +375,11 @@ static int pmain (lua_State *L) {
   return 0;
 }
 
-
+// lua.c->main => lapi.c->lua_cpcall 
+//  => ldo.c->luaD_pcall => ldo.c -> luaD_rawrunprotected
+//   => lapi.c->f_Ccall => ldo.c->luaD_call =>
+//    ldo.c->luaD_precall => lvm.c -> luaV_execute
+// 如上是靠pmain来进行的代码解析
 int main (int argc, char **argv) {
   int status;
   struct Smain s;

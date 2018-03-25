@@ -870,7 +870,7 @@ static void expr (LexState *ls, expdesc *v) {
 ** =======================================================================
 */
 
-
+//判断接下来的是不是一个block，即if else 这些
 static int block_follow (int token) {
   switch (token) {
     case TK_ELSE: case TK_ELSEIF: case TK_END:
@@ -1002,6 +1002,7 @@ static void whilestat (LexState *ls, int line) {
   condexit = cond(ls);
   enterblock(fs, &bl, 1);
   checknext(ls, TK_DO);
+  //这里面其实又是进行了一次chunk
   block(ls);
   luaK_patchlist(fs, luaK_jump(fs), whileinit);
   check_match(ls, TK_END, TK_WHILE, line);
@@ -1223,7 +1224,7 @@ static void funcstat (LexState *ls, int line) {
   luaK_fixline(ls->fs, line);  /* definition `happens' in the first line */
 }
 
-
+//表达式语句的解析
 static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
   FuncState *fs = ls->fs;
@@ -1270,7 +1271,7 @@ static void retstat (LexState *ls) {
   luaK_ret(fs, first, nret);
 }
 
-
+//真正解析代码的开始
 static int statement (LexState *ls) {
   int line = ls->linenumber;  /* may be needed for error messages */
   switch (ls->t.token) {
@@ -1328,7 +1329,10 @@ static int statement (LexState *ls) {
 static void chunk (LexState *ls) {
   /* chunk -> { stat [`;'] } */
   int islast = 0;
+  //函数嵌套最多只能是200层
   enterlevel(ls);
+  //实际上这个判断语句就是判断是不是到最后了，islast和block都要结束了才算结束
+  //islast可以认为是代码字符串的结束，block的结束表示语义上的结束
   while (!islast && !block_follow(ls->t.token)) {
     islast = statement(ls);
     testnext(ls, ';');

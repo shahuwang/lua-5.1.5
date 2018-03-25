@@ -189,7 +189,7 @@ typedef struct lua_TValue {
 #define iscollectable(o)	(ttype(o) >= LUA_TSTRING)
 
 
-
+//栈数据的指针
 typedef TValue *StkId;  /* index to stack elements */
 
 

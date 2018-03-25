@@ -849,6 +849,8 @@ static void f_Ccall (lua_State *L, void *ud) {
 LUA_API int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   struct CCallS c;
   int status;
+  //这里的lua_lock和lua_unlock是完全没意义的，纯粹是占位
+  //主要是留给在其他平台实现多线程lua的人使用的
   lua_lock(L);
   c.func = func;
   c.ud = ud;
@@ -857,13 +859,14 @@ LUA_API int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   return status;
 }
 
-
+//这里算是真正执行Lua代码开始的地方了，解析代码，执行
 LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
                       const char *chunkname) {
   ZIO z;
   int status;
   lua_lock(L);
   if (!chunkname) chunkname = "?";
+  //初始化z，这个data，似乎是代码之外额外的数据
   luaZ_init(L, &z, reader, data);
   status = luaD_protectedparser(L, &z, chunkname);
   lua_unlock(L);

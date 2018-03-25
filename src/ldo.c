@@ -461,6 +461,8 @@ int luaD_pcall (lua_State *L, Pfunc func, void *u,
   lu_byte old_allowhooks = L->allowhook;
   ptrdiff_t old_errfunc = L->errfunc;
   L->errfunc = ef;
+  //这个是真正执行的函数吗
+  //func 是f_Ccall这样的函数，u是包含了pmain这个函数的数据结构
   status = luaD_rawrunprotected(L, func, u);
   if (status != 0) {  /* an error occurred? */
     StkId oldtop = restorestack(L, old_top);
@@ -493,10 +495,13 @@ static void f_parser (lua_State *L, void *ud) {
   Proto *tf;
   Closure *cl;
   struct SParser *p = cast(struct SParser *, ud);
+  // 拿到第一个字符
   int c = luaZ_lookahead(p->z);
   luaC_checkGC(L);
+  // 如果开头的第一个字符\,则表示是已编译的代码使用luaU_undump加载，否则就是普通的lua代码
   tf = ((c == LUA_SIGNATURE[0]) ? luaU_undump : luaY_parser)(L, p->z,
                                                              &p->buff, p->name);
+  // nups表示upvalue的数量
   cl = luaF_newLclosure(L, tf->nups, hvalue(gt(L)));
   cl->l.p = tf;
   for (i = 0; i < tf->nups; i++)  /* initialize eventual upvalues */
@@ -509,8 +514,10 @@ static void f_parser (lua_State *L, void *ud) {
 int luaD_protectedparser (lua_State *L, ZIO *z, const char *name) {
   struct SParser p;
   int status;
-  p.z = z; p.name = name;
+  p.z = z; p.name = name; //name是chunkname
+  //将p.buff初始化为空
   luaZ_initbuffer(L, &p.buff);
+  //savestack 计算的是L->top 和 L-stack的指针差值
   status = luaD_pcall(L, f_parser, &p, savestack(L, L->top), L->errfunc);
   luaZ_freebuffer(L, &p.buff);
   return status;

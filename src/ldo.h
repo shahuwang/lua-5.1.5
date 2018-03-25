@@ -20,7 +20,7 @@
 
 
 #define incr_top(L) {luaD_checkstack(L,1); L->top++;}
-
+//计算差值
 #define savestack(L,p)		((char *)(p) - (char *)L->stack)
 #define restorestack(L,n)	((TValue *)((char *)L->stack + (n)))
 

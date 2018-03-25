@@ -34,7 +34,7 @@ struct lua_longjmp;  /* defined in ldo.c */
 #define BASIC_STACK_SIZE        (2*LUA_MINSTACK)
 
 
-
+//存放所有字符串的地方
 typedef struct stringtable {
   GCObject **hash;
   lu_int32 nuse;  /* number of elements */
@@ -49,7 +49,7 @@ typedef struct CallInfo {
   StkId base;  /* base for this function */
   StkId func;  /* function index in the stack */
   StkId	top;  /* top for this function */
-  const Instruction *savedpc;
+  const Instruction *savedpc; //虚拟机指令
   int nresults;  /* expected number of results from this function */
   int tailcalls;  /* number of tail calls lost under this entry */
 } CallInfo;
@@ -98,7 +98,7 @@ typedef struct global_State {
 ** `per thread' state
 */
 struct lua_State {
-  CommonHeader;
+  CommonHeader; // 可回收的通用字段
   lu_byte status;
   StkId top;  /* first free slot in the stack */
   StkId base;  /* base of current function */

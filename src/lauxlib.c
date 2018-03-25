@@ -15,6 +15,7 @@
 
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
+辅助函数
 */
 
 #define lauxlib_c

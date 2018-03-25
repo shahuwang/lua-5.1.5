@@ -31,9 +31,16 @@ int luaZ_fill (ZIO *z) {
   return char2int(*(z->p++));
 }
 
-
+// struct Zio {
+//   size_t n;			/* bytes still unread */
+//   const char *p;		/* current position in buffer */
+//   lua_Reader reader;
+//   void* data;			/* additional data */
+//   lua_State *L;			/* Lua state (for reader) */
+// };
 int luaZ_lookahead (ZIO *z) {
   if (z->n == 0) {
+    //判断是否结束了，由于luaZ_fill改变了n和p的值，所以需要退回去
     if (luaZ_fill(z) == EOZ)
       return EOZ;
     else {
