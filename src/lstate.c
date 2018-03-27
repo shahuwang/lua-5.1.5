@@ -38,13 +38,13 @@ typedef struct LG {
 } LG;
   
 
-
+//这个函数只用在了f_luaopen里，参数都是一样的，等同于复制，奇怪
 static void stack_init (lua_State *L1, lua_State *L) {
   /* initialize CallInfo array */
   L1->base_ci = luaM_newvector(L, BASIC_CI_SIZE, CallInfo);
-  L1->ci = L1->base_ci;
+  L1->ci = L1->base_ci; //说明ci指向了base_ci的第一个元素，也就是说最终ci指向的是base_ci中的某个元素
   L1->size_ci = BASIC_CI_SIZE;
-  L1->end_ci = L1->base_ci + L1->size_ci - 1;
+  L1->end_ci = L1->base_ci + L1->size_ci - 1; //指向base_ci的最后一个位置
   /* initialize stack array */
   L1->stack = luaM_newvector(L, BASIC_STACK_SIZE + EXTRA_STACK, TValue);
   L1->stacksize = BASIC_STACK_SIZE + EXTRA_STACK;
@@ -68,10 +68,10 @@ static void freestack (lua_State *L, lua_State *L1) {
 ** open parts that may cause memory-allocation errors
 */
 static void f_luaopen (lua_State *L, void *ud) {
-  global_State *g = G(L);
-  UNUSED(ud);
-  stack_init(L, L);  /* init stack */
-  sethvalue(L, gt(L), luaH_new(L, 0, 2));  /* table of globals */
+  global_State *g = G(L); //从L中取得全局的state
+  UNUSED(ud);//无意义，占位
+  stack_init(L, L);  /* init stack 用L来给L初始化，奇怪*/
+  sethvalue(L, gt(L), luaH_new(L, 0, 2));  /* table of globals, gt(L) 取的是全局的table */
   sethvalue(L, registry(L), luaH_new(L, 0, 2));  /* registry */
   luaS_resize(L, MINSTRTABSIZE);  /* initial size of string table */
   luaT_init(L);
@@ -139,7 +139,7 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
   luaM_freemem(L, fromstate(L1), state_size(lua_State));
 }
 
-
+//目前只在lauxlib.c里面有看到这个函数，ud的值是NULL
 LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   int i;
   lua_State *L;
@@ -149,11 +149,11 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   L = tostate(l);
   g = &((LG *)L)->g;
   L->next = NULL;
-  L->tt = LUA_TTHREAD;
+  L->tt = LUA_TTHREAD;  //tt字段包含在CommonHeaders里面，用于表示数据类型
   g->currentwhite = bit2mask(WHITE0BIT, FIXEDBIT);
   L->marked = luaC_white(g);
   set2bits(L->marked, FIXEDBIT, SFIXEDBIT);
-  preinit_state(L, g);
+  preinit_state(L, g);//初始化L，并把g赋值给L的字段
   g->frealloc = f;
   g->ud = ud;
   g->mainthread = L;

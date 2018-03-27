@@ -96,17 +96,18 @@ typedef struct global_State {
 
 /*
 ** `per thread' state
+主要可参考这篇文章：https://jin-yang.github.io/post/lua-sourcecode.html
 */
 struct lua_State {
   CommonHeader; // 可回收的通用字段
   lu_byte status;
-  StkId top;  /* first free slot in the stack */
-  StkId base;  /* base of current function */
+  StkId top;  /* first free slot in the stack 栈中第一个空的位置*/
+  StkId base;  /* base of current function 函数参数的位置*/
   global_State *l_G;
   CallInfo *ci;  /* call info for current function */
-  const Instruction *savedpc;  /* `savedpc' of current function */
-  StkId stack_last;  /* last free slot in the stack */
-  StkId stack;  /* stack base */
+  const Instruction *savedpc;  /* `savedpc' of current function 指向了当前函数的代码，ldo.c里面，指向的是Proto里面的code字段*/
+  StkId stack_last;  /* last free slot in the stack 栈中最后一个空的位置*/
+  StkId stack;  /* stack base 栈底*/
   CallInfo *end_ci;  /* points after end of ci array*/
   CallInfo *base_ci;  /* array of CallInfo's */
   int stacksize;
