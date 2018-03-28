@@ -267,7 +267,7 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
   ptrdiff_t funcr;
   if (!ttisfunction(func)) /* `func' is not a function? */
     func = tryfuncTM(L, func);  /* check the `function' tag method */
-  funcr = savestack(L, func);
+  funcr = savestack(L, func); //计算的是函数位置和栈底的差值
   cl = &clvalue(func)->l;
   L->ci->savedpc = L->savedpc;
   if (!cl->isC) {  /* Lua function? prepare its call */
