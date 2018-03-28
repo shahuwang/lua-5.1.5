@@ -379,7 +379,10 @@ static void close_func (LexState *ls) {
   L->top -= 2;  /* remove table and prototype from the stack */
 }
 
-
+/**
+ * 调用路径: [lapi.c]lua_load -> [ldo.c]luaD_protectedparser -> [ldo.c]f_parser
+ * 
+ * */
 Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff, const char *name) {
   struct LexState lexstate;
   struct FuncState funcstate;
