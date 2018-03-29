@@ -48,11 +48,13 @@ const char lua_ident[] =
 static TValue *index2adr (lua_State *L, int idx) {
   if (idx > 0) {
     TValue *o = L->base + (idx - 1);
+    //一段lua代码解析后都被封装为一个函数，L->ci->top 是这个函数在栈中占据的最高位置，取值不能超过这个位置
     api_check(L, idx <= L->ci->top - L->base);
     if (o >= L->top) return cast(TValue *, luaO_nilobject);
     else return o;
   }
   else if (idx > LUA_REGISTRYINDEX) {
+    //负数索引的流程是如何进行的呢？
     api_check(L, idx != 0 && -idx <= L->top - L->base);
     return L->top + idx;
   }
@@ -65,6 +67,7 @@ static TValue *index2adr (lua_State *L, int idx) {
     }
     case LUA_GLOBALSINDEX: return gt(L);
     default: {
+      //这里不是在栈上进行查找，而是查找upvalue了
       Closure *func = curr_func(L);
       idx = LUA_GLOBALSINDEX - idx;
       return (idx <= func->c.nupvalues)
@@ -223,7 +226,7 @@ LUA_API void lua_replace (lua_State *L, int idx) {
   lua_unlock(L);
 }
 
-
+//差不多等同于clone
 LUA_API void lua_pushvalue (lua_State *L, int idx) {
   lua_lock(L);
   setobj2s(L, L->top, index2adr(L, idx));
@@ -777,7 +780,7 @@ LUA_API void lua_call (lua_State *L, int nargs, int nresults) {
   lua_lock(L);
   api_checknelems(L, nargs+1);
   checkresults(L, nargs, nresults);
-  func = L->top - (nargs+1);
+  func = L->top - (nargs+1); 
   luaD_call(L, func, nresults);
   adjustresults(L, nresults);
   lua_unlock(L);

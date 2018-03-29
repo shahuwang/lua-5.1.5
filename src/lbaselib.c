@@ -34,6 +34,9 @@ static int luaB_print (lua_State *L) {
   lua_getglobal(L, "tostring");
   for (i=1; i<=n; i++) {
     const char *s;
+    //base为第一个参数的位置，函数在base下面
+    //参考https://blog.csdn.net/u013517637/article/details/77835402
+    //上面已经把tostring这个函数压入到栈顶了，所以此处一直拿到的是tostring这个函数
     lua_pushvalue(L, -1);  /* function to be called */
     lua_pushvalue(L, i);   /* value to print */
     lua_call(L, 1, 1);
